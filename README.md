@@ -89,6 +89,9 @@ parametrise the container:
 * `S3FS_ARGS` can contain some additional options to be blindly passed to
   [s3fs]. options are supposed to be given comma-separated, e.g.
   `use_path_request_style,allow_other,default_acl=public-read`
+* `FORCE` set to true to enable remove existed mount before doing s3fs. This
+  option helps to make sure s3fs will always success but it can cause conflict
+  with other mount point. So use this option carefully.
 
   [secrets]: https://docs.docker.com/engine/swarm/secrets/
 

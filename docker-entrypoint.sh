@@ -50,6 +50,8 @@ AWS_S3_SECRET_ACCESS_KEY=${AWS_S3_SECRET_ACCESS_KEY:-""}
 AWS_S3_SECRET_ACCESS_KEY_FILE=${AWS_S3_SECRET_ACCESS_KEY_FILE:-""}
 AWS_S3_AUTHFILE=${AWS_S3_AUTHFILE:-""}
 
+FORCE=${FORCE:-"false"}
+
 # Check variables and defaults
 if [ -z "${AWS_S3_ACCESS_KEY_ID}" ] && \
     [ -z "${AWS_S3_SECRET_ACCESS_KEY}" ] && \
@@ -77,6 +79,13 @@ fi
 # PASSWORD_FILE-version of the setting is used)
 if [ -n "${AWS_S3_SECRET_ACCESS_KEY}" ]; then
     unset AWS_S3_SECRET_ACCESS_KEY
+fi
+
+# Force to remove the current mount of the source folder before doing s3fs,
+# without enabling this option, s3fs will exit if there is a conflict mount on the source folder
+if [ "$FORCE" = "true" ]; then
+    echo "Force unmount if exists ${AWS_S3_MOUNT}..."
+    fusermount -uz "${AWS_S3_MOUNT}" || true
 fi
 
 # Create destination directory if it does not exist.
@@ -110,14 +119,6 @@ fi
 # Additional S3FS options
 if [ -n "$S3FS_ARGS" ]; then
     S3FS_ARGS="-o $S3FS_ARGS"
-fi
-
-# Force to remove the current mount of the source folder before doing s3fs,
-# without enabling this option, s3fs will exit if there is a conflict mount on the source folder
-if [ "$FORCE" = "true" ]; then
-    echo "Force unmount if exists ${AWS_S3_MOUNT}..."
-    fusermount -uz "${AWS_S3_MOUNT}" || true
-    umount "${AWS_S3_MOUNT}" || true
 fi
 
 # Mount as the requested used.
